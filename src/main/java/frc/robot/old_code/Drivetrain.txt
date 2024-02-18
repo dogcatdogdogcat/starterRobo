@@ -29,31 +29,34 @@ public class Drivetrain{
     // driveMotorChannel, turningMotorChannel,
     // driveEncoderChannelA, driveEncoderChannelB,
     // turningEncoderChannelA, turningEncoderChannelB
-    private final SwerveModule m_frontLeft
-        = new SwerveModule(
-            1, 2,
-            0, 1, 
-            2, 3
-            );
+    // NOTE: 
+    // encoderchannels go up by 1 from 0, from the FIRST one that is connected
 
     private final SwerveModule m_frontRight
         = new SwerveModule(
-            3, 4,
+            2, 1,
+            0, 1, 
+            2, 3
+            );
+    
+    private final SwerveModule m_frontLeft
+        = new SwerveModule(
+            4, 3,
             4, 5, 
             6, 7
             );
 
-    private final SwerveModule m_backLeft
+    private final SwerveModule m_backRight
         = new SwerveModule(
-            5, 6,
-            8, 9, 
+            6, 5,
+            8, 9,
             10, 11
             );
 
-    private final SwerveModule m_backRight
+    private final SwerveModule m_backLeft
         = new SwerveModule(
-            7, 8,
-            12, 13, 
+            8, 7,
+            12, 13,
             14, 15
             );
 
@@ -76,7 +79,10 @@ public class Drivetrain{
                 m_backRight.getPosition()
               });
 
-    public Drivetrain(){
+    /**
+     * @param holdup test
+     */
+    public Drivetrain(String holdup){
         m_gyro.reset();
     }
 
@@ -109,6 +115,8 @@ public class Drivetrain{
             )
         );
 
+        System.out.println("swerveModuleStates0: " + swerveModuleStates[0]);
+
         // renormalizes wheel speeds in case one is faster than needed
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
         
@@ -116,6 +124,8 @@ public class Drivetrain{
         m_frontRight.setDesiredState(swerveModuleStates[1]);
         m_backLeft.setDesiredState(swerveModuleStates[2]);
         m_backRight.setDesiredState(swerveModuleStates[3]);
+
+        System.out.println("RUNNING DRIVE");
 
     }
 

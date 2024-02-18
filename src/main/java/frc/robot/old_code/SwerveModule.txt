@@ -48,15 +48,8 @@ public class SwerveModule {
 	private final PIDController m_drivePIDController
 		= new PIDController(1, 0, 0);
 
-	private final ProfiledPIDController m_turningPIDController
-		= new ProfiledPIDController(
-			1,
-			0,
-			0,
-			new TrapezoidProfile.Constraints(
-				kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration
-			)
-		);
+	private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(1, 0, 0,
+			new TrapezoidProfile.Constraints(kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
 	
 	// probably helps calculate feedforward commands for motor control
 	private final SimpleMotorFeedforward m_driveFeedforward
@@ -77,11 +70,15 @@ public class SwerveModule {
 		int turningEncoderChannelA,
 		int turningEncoderChannelB
 	){
-		// Attach motors to their respective channels
+
+		// this runs when initializing for some reason... 4 times
+		System.out.println("RUNNING SWERVEMODULE");
+
+		// ####### MOTORS #######
 		m_driveMotor = new PWMSparkMax(driveMotorChannel);
 		m_turningMotor = new PWMSparkMax(turningMotorChannel);
 
-		// Attach encoders to their respective channels
+		// ####### ENCODERS #######
 		m_driveEncoder = new Encoder(driveEncoderChannelA, driveEncoderChannelB);
 		m_turningEncoder = new Encoder(turningEncoderChannelA, turningEncoderChannelB);
 
@@ -114,12 +111,20 @@ public class SwerveModule {
 	}
 
 	public void setDesiredState(SwerveModuleState desiredState){
+
+		var test5 = Double.toString(m_turningEncoder.getDistance());
+		var test6 = Double.toString(m_driveEncoder.getRate());
+		System.out.println("m_tE dist: " + test5);
+		System.out.println("m_dE rate: " + test6);
+
 		var encoderRotation = new Rotation2d(m_turningEncoder.getDistance());
 		
 		// avoids spinning > 90 deg
 		SwerveModuleState state = SwerveModuleState.optimize(desiredState, encoderRotation);
 		
 		state.speedMetersPerSecond *= state.angle.minus(encoderRotation).getCos();
+
+		System.out.println("speedMPS: " + state.speedMetersPerSecond);
 
 		final double driveOutput 
 			= m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
@@ -128,7 +133,7 @@ public class SwerveModule {
 			= m_driveFeedforward.calculate(state.speedMetersPerSecond);
 
 		final double turnOutput
-			= m_turnFeedforward.calculate(m_turningEncoder.getDistance(), state.angle.getRadians());
+			= m_turnFeedforward.calculate(m_turningEncoder.getDistance(), state.angle.getRadians());			
 
 		final double turnFeedforward
 			= m_turnFeedforward.calculate(m_turningPIDController.getSetpoint().velocity);
@@ -136,5 +141,20 @@ public class SwerveModule {
 		// makes da things turn
 		m_driveMotor.setVoltage(driveOutput + driveFeedforward);
 		m_turningMotor.setVoltage(turnOutput + turnFeedforward);
+
+		String test = Double.toString(turnOutput);
+		System.out.println("turnOutput: " + test);
+
+		String test2 = Double.toString(driveOutput);
+		System.out.println("driveOutput: " + test2);
+
+		String test3 = Double.toString(driveFeedforward);
+		System.out.println("driveFeedforward: " + test3);
+
+		String test4 = Double.toString(turnFeedforward);
+		System.out.println("turnFeedforward: " + test4);
+		
+		System.out.println("RUNNING SETDESIRED");
+
 	}
 }

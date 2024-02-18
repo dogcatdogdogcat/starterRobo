@@ -6,9 +6,9 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 
-public class Robot extends TimedRobot{
+public class Phoenix extends TimedRobot{
     private final XboxController m_Controller = new XboxController(0);
-    private final Drivetrain m_Swerve = new Drivetrain();
+    private final Phoenixtrain m_Swerve = new Phoenixtrain();
 
     // slewratelimiters used to make the joystick controls gentler
     private final SlewRateLimiter m_xSpeedLimiter = new SlewRateLimiter(3);
@@ -22,29 +22,34 @@ public class Robot extends TimedRobot{
 
     @Override
     public void teleopPeriodic(){
-        joystickDrive(true);
+        joystickDrive();
     }
 
-    private void joystickDrive(boolean fieldRelative){
+    private void joystickDrive(){
         // Below vars are inverted because xbox controllers return
         // negative values when pushed forward or pulled to the left
-
         // forward or backwards speed
         final var xSpeed
             = -m_xSpeedLimiter.calculate(MathUtil.applyDeadband(m_Controller.getLeftY(), 0.02))
-            * Drivetrain.kMaxSpeed;
+            * Phoenixtrain.kMaxSpeed;
+
+        System.out.println("xSpeed: " + xSpeed);
 
         //sideways or strafe speed
         final var ySpeed
             = -m_ySpeedLimiter.calculate(MathUtil.applyDeadband(m_Controller.getLeftX(), 0.02))
-            * Drivetrain.kMaxSpeed;
+            * Phoenixtrain.kMaxSpeed;
+
+        System.out.println("ySpeed: " + ySpeed);
 
         // rate of angular rotation
         final var rot
             = -m_rotLimiter.calculate(MathUtil.applyDeadband(m_Controller.getRightX(), 0.02))
-            * Drivetrain.kMaxAngularSpeed;
+            * Phoenixtrain.kMaxAngularSpeed;
 
-        m_Swerve.Drive(xSpeed, ySpeed, rot, fieldRelative, getPeriod());
+        System.out.println("rot:" + rot);
+
+        m_Swerve.Drive(xSpeed, ySpeed, rot);
 
     }
 }
