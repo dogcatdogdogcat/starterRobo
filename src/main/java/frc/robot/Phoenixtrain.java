@@ -75,13 +75,9 @@ public class Phoenixtrain {
         
         // SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
 
-        System.out.println("SMS0: " + swerveModuleStates[0]);
-        System.out.println("SMS1: " + swerveModuleStates[1]);
-        System.out.println("SMS2: " + swerveModuleStates[2]);
-        System.out.println("SMS3: " + swerveModuleStates[3]);
 
+        System.out.println("SwerveModuleStates Array: " + swerveModuleStates);
 
-        // these don't do anything yet but they will tomorrow
         m_frontLeft.setDesiredState(swerveModuleStates[0], "FL");
         m_frontRight.setDesiredState(swerveModuleStates[1], "FR");
 
