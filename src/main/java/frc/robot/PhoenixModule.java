@@ -6,10 +6,18 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import com.revrobotics.SparkPIDController;
+
+import edu.wpi.first.math.controller.PIDController;
+// import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 @SuppressWarnings("")
 public class PhoenixModule {
+	// PID Controllers
+	// private PIDController driveController = new PIDController(1, 1, 1);
+	private PIDController steeringController = new PIDController(1, 1, 1);
 		
 	// DRIVING elements of the swerve module
 	private CANSparkMax m_driveMotor;
@@ -20,6 +28,23 @@ public class PhoenixModule {
 	private CANcoder m_steeringCANcoder;
 	private RelativeEncoder m_steeringIntegratedEncoder;
 
+	// public SwerveModuleState getState(){
+	// 	return new SwerveModuleState(
+	// 		m_driveIntegratedEncoder.getRate(),
+	// 		new Rotation2d(
+	// 			m_steeringIntegratedEncoder.getDistance()
+	// 		)
+	// 	);
+	// }
+
+	// public SwerveModulePosition getPosition(){
+	// 	return new SwerveModulePosition(
+	// 		m_driveIntegratedEncoder.getDistance(),
+	// 		new Rotation2d(
+	// 			m_steeringIntegratedEncoder.getDistance()
+	// 		)
+	// 	);
+	// }
 
 	/**
      * Method to instantiate a swerve module with motors and encoders.
@@ -47,11 +72,20 @@ public class PhoenixModule {
 		// STEERING AND INTEGRATED ENCODER
 		m_steeringMotor = new CANSparkMax(steeringMotorID, MotorType.kBrushless);
 		m_steeringIntegratedEncoder = m_steeringMotor.getEncoder();
+		m_steeringMotor.getPIDController();
+
+		System.out.println("Drive Integrated Encoder: " + m_driveIntegratedEncoder);
+		System.out.println("Steer Integrated Encoder: " + m_steeringIntegratedEncoder);
+		System.out.println("STEERING MOTOR: " + m_steeringMotor);
+		System.out.println("DRIVING MOTOR: " + m_driveMotor);
+		System.out.println("Steering cancoder: " + m_steeringCANcoder);
+
 		
 	}
 
+	public void setDesiredState(SwerveModuleState desiredState, String specifiedMod){
+		System.out.println("DesiredState, Specified Mod: " + desiredState.speedMetersPerSecond + specifiedMod);
 
-	public void setDesiredState(SwerveModuleState desiredState){
-
+		m_driveMotor.set(1);
 	}
 }
