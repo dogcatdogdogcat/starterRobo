@@ -7,18 +7,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 // import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-@SuppressWarnings("")
 public class PhoenixModule {
 	// PID Controllers
 	// private PIDController driveController;
 	private SparkPIDController steeringController;
-	private Rotation2d angle = new Rotation2d(50);
 		
 	// DRIVING elements of the swerve module
 	private CANSparkMax m_driveMotor;
@@ -28,6 +24,8 @@ public class PhoenixModule {
 	private CANSparkMax m_steeringMotor;
 	private CANcoder m_steeringCANcoder;
 	private RelativeEncoder m_steeringIntegratedEncoder;
+
+	public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
 
 	// public SwerveModuleState getState(){
 	// 	return new SwerveModuleState(
@@ -75,18 +73,46 @@ public class PhoenixModule {
 		m_steeringIntegratedEncoder = m_steeringMotor.getEncoder();
 		steeringController = m_steeringMotor.getPIDController();
 
-		System.out.println("PID Controller: " + steeringController);
+		// PID coefficients
+		kP = 0.1; 
+		kI = 1e-4;
+		kD = 1; 
+		kIz = 0; 
+		kFF = 0; 
+		kMaxOutput = 1; 
+		kMinOutput = -1;
+	
+		// set PID coefficients
+		steeringController.setP(kP);
+		steeringController.setI(kI);
+		steeringController.setD(kD);
+		steeringController.setIZone(kIz);
+		steeringController.setFF(kFF);
+		steeringController.setOutputRange(kMinOutput, kMaxOutput);
+
+		System.out.println("PID Controller: " + steeringController.toString());
 
 	}
 
 	public void setDesiredState(SwerveModuleState desiredState, String specifiedMod){
 		System.out.println("DS MPS, Module: " + desiredState.speedMetersPerSecond + specifiedMod);
+		System.out.println(desiredState.angle.getDegrees());
+		
+		// UPDATE: ONLY FRONT RIGHT MOVES 
+		// front left trying to recalibrate through rotating?
 
-		// angle completely bricks the program, immediately disables everything
-		angle = new Rotation2d(20);
-		steeringController.setReference(angle.getDegrees(), ControlType.kPosition);
+		// when commenting out steeringController.sR(), all of them turn the wheels as they should. 
+		// probably some other issues of sending info to setDesiredState
 
-		m_driveMotor.set(desiredState.speedMetersPerSecond/3);
+		// some other issue regarding chassis speeds not being set
+
+		// to the right right joystick 
+
+		// THIS IS THE PROBLEM
+
+		steeringController.setReference(desiredState.angle.getDegrees()/3, CANSparkMax.ControlType.kPosition);
+		m_driveMotor.set(desiredState.speedMetersPerSecond/10);
+
 		// desiredState.speedMetersPerSecond = 0.0;
 	}
 }

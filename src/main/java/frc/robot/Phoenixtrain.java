@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 // import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 // import edu.wpi.first.math.kinematics.SwerveModulePosition;
 // import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class Phoenixtrain {
     // max speed for the robot
@@ -66,24 +67,17 @@ public class Phoenixtrain {
      * @param periodSeconds Unsure of what this variable does but it seems important.
      */
 
-    public void Drive(
-        double xSpeed, double ySpeed, double rot
-    ){
+    public void Drive(Translation2d translation, double rotation) {
 
-        var swerveModuleStates = 
-            m_kinematics.toSwerveModuleStates(new ChassisSpeeds(xSpeed, ySpeed, rot));
+        SwerveModuleState[] swerveModuleStates = m_kinematics.toSwerveModuleStates(
+            new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
+        );
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, 4.1);
         
-        // SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, kMaxSpeed);
-
-
-        System.out.println("SwerveModuleStates Array: " + swerveModuleStates);
-
         m_frontLeft.setDesiredState(swerveModuleStates[0], "FL");
         m_frontRight.setDesiredState(swerveModuleStates[1], "FR");
-
         m_backLeft.setDesiredState(swerveModuleStates[2], "BL");
         m_backRight.setDesiredState(swerveModuleStates[3], "BR");
-
     }
 
     // public void updateOdometry(){
